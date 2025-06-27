@@ -1,0 +1,8 @@
+Flask
+google-generativeai
+Pillow
+google-auth
+google-auth-httplib2
+requests
+openai
+flask-cors
