@@ -188,7 +188,9 @@ def ai_generate_hashtag():
 
     prompt = """
     아래 행사 펀딩 소개글을 바탕으로 해시태그를 만들어줘.
-    * 반드시 !! 아래 형식으로 응답해줘 *
+    * 아래를 반드시 지켜야 함
+    1.
+    2. 반드시 !! 아래 형식으로 응답해줘
     ["해시태그1", "해시태그2", "해시태그3"]
     
     아래는 예시야.
@@ -221,6 +223,46 @@ def ai_generate_hashtag():
     except Exception as e:
         return jsonify({"error": f"API 호출 중 오류가 발생했습니다: {str(e)}"}), 500
 
+@bp_text.route('/ai/budgets')
+def ai_generate_money():
+    query = request.args.get('query')
+    if not query:
+        return jsonify({"error": "query 파라미터가 필요합니다."}), 400
+
+    # TODO: 추후 RAG 적용 필요
+    prompt = """
+    너는 행사 전문가야. 유저의 아이디어를 바탕으로 펀딩 예산 항목들을 예측해줘
+    1. 4개 이내로 해줘.
+    2. 반드시 아래 형식으로 응답해줘
+    ["대관료", "인건비", "물품구입비"]
+
+    아래는 예시야.
+    input: 마라톤 행사를 하고 싶어. 동네 사람들이랑 같이 뛰고 싶어서. 다 같이 뛰고 나면 기분이 좋아질 것 같아.
+    output: ["공간대관비", "인건비", "물품구입비"]
+    ----------------------------
+    """
+
+    prompt += f"input: {query}\noutput:"
+
+    try:
+        model = genai.GenerativeModel('gemini-1.5-flash')
+        response = model.generate_content(prompt)
+    
+        print("ai_generate_question ai response is: ", response)
+
+        # 응답 텍스트 정리
+        response_text = response.text.strip()
+
+        items = extract_list(response_text)
+
+        if items:
+            return jsonify({"budgets": items})
+        else:
+            # 모든 시도가 실패한 경우 빈 리스트 반환
+            return jsonify({"budgets": []})
+
+    except Exception as e:
+        return jsonify({"error": f"API 호출 중 오류가 발생했습니다: {str(e)}"}), 500
 
 def extract_list(text):
     # 응답 텍스트 정리
