@@ -62,4 +62,4 @@ echo -e "${GREEN}🎉 배포 완료!${NC}"
 echo -e "${YELLOW}📋 다음 명령어로 서비스 URL을 확인하세요:${NC}"
 echo "gcloud run services describe $SERVICE_NAME --region=$REGION --format='value(status.url)'"
 
-curl "https://flask-hello-world-service-698010238719.us-central1.run.app/ai?query=안녕하세요" 
+curl "https://flask-hello-world-service-698010238719.us-central1.run.app/health" 
